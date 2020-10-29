@@ -7,7 +7,7 @@ class TestPlayer:
         pass
 
     def getMove(self, lastReward, lastMove):
-        if lastReward > self.average:
+        if lastReward >= self.average:
             move = lastMove[self.player]
         else:
             move = abs(lastMove[self.player]-1)
