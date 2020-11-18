@@ -4,7 +4,6 @@ class TestPlayer:
         self.average = 0
         self.count = 0
         self.player = player
-        pass
 
     def getMove(self, lastReward, lastMove):
         if lastReward >= self.average:

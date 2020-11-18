@@ -4,7 +4,6 @@ class Human:
         self.average = 0
         self.count = 0
         self.player = player
-        pass
 
     def getMove(self, lastReward, lastMove):
         self.newAverage(lastReward)
