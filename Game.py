@@ -1,4 +1,4 @@
-import Human, TestPlayer, WoLF
+import Human, TestPlayer, WoLF, distribution
 
 class Game:
 
@@ -8,8 +8,10 @@ class Game:
         self.bottomLeft = bottomLeft
         self.bottomRight = bottomRight
         self.game = [[self.topLeft, self.topRight], [self.bottomLeft, self.bottomRight]]
-        self.playerOne = WoLF.WoLF(0, 0.2, 0.9, 0.05, 0.15, 4, 2)
-        self.playerTwo = WoLF.WoLF(1, 0.2, 0.9, 0.05, 0.15, 4, 2)
+        distr = distribution.distribution()
+        self.playerOne = WoLF.WoLF(0, 0.2, 0.9, 0.05, 0.15, 4, 2, distr)
+        self.playerTwo = WoLF.WoLF(1, 0.2, 0.9, 0.05, 0.15, 4, 2, distr)
+
 
     def getMoveReward(self, onePick, twoPick, player):
         return self.game[onePick][twoPick][player]
@@ -31,8 +33,12 @@ class Game:
             print("Player 1: ", onePick, self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()))
             print("Player 2: ", twoPick, self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()))
 
+def main():
+    newGame = Game([-3,-3], [0,-5], [-5,0], [-1,-1])
+    print(newGame.getMoveValues(0,1))
+    print(newGame.getMoveReward(0,1,1))
+    newGame.startLoop()
 
-newGame = Game([-3,-3], [0,-5], [-5,0], [-1,-1])
-print(newGame.getMoveValues(0,1))
-print(newGame.getMoveReward(0,1,1))
-newGame.startLoop()
+
+if __name__ == "__main__":
+    main()
