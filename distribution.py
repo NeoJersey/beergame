@@ -9,9 +9,10 @@ class distribution:
     def getNext(self):
         next = self.data[self.count]
         self.count +=1
-        if next <50:
-            return 0
-        return 1
+        if self.count == 500:
+            self.count = 0
+            self.data = poisson.rvs(loc=0, mu=50, size=500)
+        return next
 
     def getCount(self):
         return self.count

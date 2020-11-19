@@ -1,9 +1,8 @@
 import random
-from scipy.stats import norm
 
 class WoLF:
 
-    def __init__(self, player, alpha, gamma, delta_win, delta_lose, num_states, num_actions, distr):
+    def __init__(self, player, alpha, gamma, delta_win, delta_lose, num_states, num_actions):
         self.player = player
         self.alpha = alpha
         self.delta_win = delta_win
@@ -15,7 +14,6 @@ class WoLF:
         self.C = [0 for _ in range(num_states)]
         self.last_state = -1
         self.avpi = [[1/num_actions] * num_actions for _ in range(num_states)]
-        self.distr = distr
 
     def getMove(self,lastReward, lastMove):
         value = self.select_action()
@@ -23,24 +21,25 @@ class WoLF:
 
     def select_action(self):
         state = self.last_state
-        
-        return self.distr.getNext()
-
-        # if state == -1:
-        #     choice = random.choice(range(self.num_actions))
-        #     return choice
-        # target = random.random()
-        # collect = self.pi[state][0]
-        # print("target", target, "collect", collect,self.pi)
-        # if target < collect:
-        #     return 0
-        # for i in range(1, len(self.pi[state])):
-        #     collect += self.pi[state][i]
-        #     if target < collect:
-        #         return i
-        # return self.num_actions-1
+        self.printpi()
+        if state == -1:
+            choice = random.choice(range(self.num_actions))
+            return choice
+        target = random.random()
+        collect = self.pi[state][0]
+        if target < collect:
+            return 0
+        for i in range(1, len(self.pi[state])):
+            collect += self.pi[state][i]
+            if target < collect:
+                return i
+        return self.num_actions-1
 
     def update(self, own, other, reward):
+        if self.player == 1:
+            temp = own
+            own = other
+            other = temp
         state = own*2 + other
         if self.last_state != -1:
             self.Q[self.last_state][own] = (1-self.alpha)*self.Q[self.last_state][own] + self.alpha * (reward + self.gamma * max(self.Q[state]))
@@ -71,7 +70,7 @@ class WoLF:
         return self.player
 
     def printpi(self):
-        print("Player: ", self.player, self.pi)
+        print("Player: ", self.player, "Pi values: ", self.pi)
 
     def printQpi(self, state, action):
         print(self.Q[state][action])
