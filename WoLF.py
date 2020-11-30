@@ -61,7 +61,10 @@ class WoLF:
             elif self.pi[self.last_state][own] > 1:
                 self.pi[self.last_state][own] = 1
         self.last_state = state
-        #self.printpi()
+        self.printpi()
+
+    def updateQ(self, own, state, reward):
+        self.Q[self.last_state][own] = (1 - self.alpha) * self.Q[self.last_state][own] + self.alpha * (reward + self.gamma * max(self.Q[state]))
 
     def getPlayer(self):
         return self.player

@@ -38,6 +38,9 @@ class Game:
                 print("Player 1: ", "Pick: ", twoPick, "Reward:",self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()))
                 self.playerOne.update(onePick, 0, self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()))
                 self.playerTwo.update(twoPick, 0, self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()))
+            else:
+                self.playerOne.updateQ(onePick, 0, self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()))
+                self.playerTwo.updateQ(twoPick, 0, self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()))
             self.tick += 1
         print("Player 0: ","Pick: ", onePick, "Reward:", self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()), "Tick: " ,self.tick)
         print("Player 1: ","Pick: ", twoPick, "Reward:", self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()))
