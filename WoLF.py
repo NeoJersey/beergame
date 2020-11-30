@@ -19,7 +19,7 @@ class WoLF:
         value = self.select_action(tick)
         return value
 
-    #TODO Exploration epsilon-greedy
+
     def select_action(self, tick):
         state = self.last_state
         self.printpi()
@@ -29,8 +29,12 @@ class WoLF:
             return choice
         target = random.random()
         collect = 0
+        sumProbs = sum(self.pi[state])
+        if sumProbs == 0:
+            choice = random.choice(range(self.num_actions))
+            return choice
         for i in range(len(self.pi[state])):
-            collect += self.pi[state][i]
+            collect += self.pi[state][i]/sumProbs
             if target < collect:
                 return i
         return self.num_actions-1

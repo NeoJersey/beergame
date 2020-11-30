@@ -28,9 +28,11 @@ class Game:
         self.loop(onePick, twoPick)
 
     def loop(self, onePick, twoPick):
-        while(self. tick < 100000):
+        updateCount = 0
+        while(self. tick < 10000):
             #self.nextMove = self.tick
             if self.tick == self.nextMove:
+                updateCount+=1
                 onePick = self.playerOne.getMove(self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()), [onePick, twoPick], self.tick)
                 twoPick = self.playerTwo.getMove(self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()), [onePick, twoPick], self.tick)
                 self.nextMove = self.tick + self.distr.getNext()
@@ -44,6 +46,7 @@ class Game:
             self.tick += 1
         print("Player 0: ","Pick: ", onePick, "Reward:", self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()), "Tick: " ,self.tick)
         print("Player 1: ","Pick: ", twoPick, "Reward:", self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()))
+        print(f"Number of Selections: {updateCount}")
         self.playerOne.printpi()
         self.playerTwo.printpi()
 #onePick*2+twoPick
