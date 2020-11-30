@@ -9,38 +9,34 @@ class WoLF:
         self.delta_lose = delta_lose
         self.gamma = gamma
         self.num_actions = num_actions
-        self.Q = [[0] * num_actions for _ in range(num_states)]
+        self.Q = [[0.0] * num_actions for _ in range(num_states)]
         self.pi = [[1/num_actions] * num_actions for _ in range(num_states)]
         self.C = [0 for _ in range(num_states)]
         self.last_state = -1
-        self.avpi = [[1/num_actions] * num_actions for _ in range(num_states)]
+        self.avpi = [[0.0] * num_actions for _ in range(num_states)]
 
-    def getMove(self,lastReward, lastMove):
-        value = self.select_action()
+    def getMove(self,lastReward, lastMove, tick):
+        value = self.select_action(tick)
         return value
 
-    def select_action(self):
+    #TODO Exploration epsilon-greedy
+    def select_action(self, tick):
         state = self.last_state
         self.printpi()
-        if state == -1:
+        chance = random.random()
+        if state == -1 or chance < 1/tick:
             choice = random.choice(range(self.num_actions))
             return choice
         target = random.random()
-        collect = self.pi[state][0]
-        if target < collect:
-            return 0
-        for i in range(1, len(self.pi[state])):
+        collect = 0
+        for i in range(len(self.pi[state])):
             collect += self.pi[state][i]
             if target < collect:
                 return i
         return self.num_actions-1
 
-    def update(self, own, other, reward):
-        if self.player == 1:
-            temp = own
-            own = other
-            other = temp
-        state = own*2 + other
+    #TODO Update when?
+    def update(self, own, state, reward):
         if self.last_state != -1:
             self.Q[self.last_state][own] = (1-self.alpha)*self.Q[self.last_state][own] + self.alpha * (reward + self.gamma * max(self.Q[state]))
             self.C[self.last_state] += 1
@@ -56,6 +52,7 @@ class WoLF:
             else:
                 delta = self.delta_lose
             if self.Q[state].index(max(self.Q[state])) == own:
+                #print("Check")
                 self.pi[self.last_state][own] += delta
             else:
                 self.pi[self.last_state][own] += (-delta / (self.num_actions-1))
@@ -70,7 +67,7 @@ class WoLF:
         return self.player
 
     def printpi(self):
-        print("Player: ", self.player, "Pi values: ", self.pi)
+        print("Player: ", self.player, "Pi values: ", self.pi, "Q:", self.Q)
 
     def printQpi(self, state, action):
         print(self.Q[state][action])
