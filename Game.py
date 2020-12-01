@@ -38,11 +38,11 @@ class Game:
                 self.nextMove = self.tick + self.distr.getNext()
                 print("Player 0: ", "Pick: ", onePick, "Reward:",self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()), "Tick: ", self.tick)
                 print("Player 1: ", "Pick: ", twoPick, "Reward:",self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()))
-                self.playerOne.update(onePick, 0, self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()))
-                self.playerTwo.update(twoPick, 0, self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()))
-            else:
-                self.playerOne.updateQ(onePick, 0, self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()))
-                self.playerTwo.updateQ(twoPick, 0, self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()))
+            self.playerOne.update(onePick, 0, self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()))
+            self.playerTwo.update(twoPick, 0, self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()))
+            # else:
+            #     self.playerOne.updateQ(onePick, 0, self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()))
+            #     self.playerTwo.updateQ(twoPick, 0, self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()))
             self.tick += 1
         print("Player 0: ","Pick: ", onePick, "Reward:", self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()), "Tick: " ,self.tick)
         print("Player 1: ","Pick: ", twoPick, "Reward:", self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()))
@@ -52,7 +52,7 @@ class Game:
 #onePick*2+twoPick
 
 def main():
-    newGame = Game([-3,-3], [0,-5], [-5,0], [-1,-1])
+    newGame = Game([2,2], [5,0], [0,5], [4,4])
     print(newGame.getMoveValues(0,1))
     print(newGame.getMoveReward(0,1,1))
     newGame.startLoop()

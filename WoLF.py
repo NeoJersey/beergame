@@ -58,14 +58,20 @@ class WoLF:
             if self.Q[state].index(max(self.Q[state])) == own:
                 #print("Check")
                 self.pi[self.last_state][own] += delta
+                self.pi[self.last_state][abs(own-1)] += -delta
             else:
                 self.pi[self.last_state][own] += (-delta / (self.num_actions-1))
+                self.pi[self.last_state][abs(own-1)] += -(-delta / (self.num_actions - 1))
             if self.pi[self.last_state][own] < 0:
                 self.pi[self.last_state][own] = 0
             elif self.pi[self.last_state][own] > 1:
                 self.pi[self.last_state][own] = 1
+            if self.pi[self.last_state][abs(own-1)] < 0:
+                self.pi[self.last_state][abs(own-1)] = 0
+            elif self.pi[self.last_state][abs(own-1)] > 1:
+                self.pi[self.last_state][abs(own-1)] = 1
         self.last_state = state
-        self.printpi()
+        #self.printpi()
 
     def updateQ(self, own, state, reward):
         self.Q[self.last_state][own] = (1 - self.alpha) * self.Q[self.last_state][own] + self.alpha * (reward + self.gamma * max(self.Q[state]))
