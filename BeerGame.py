@@ -58,16 +58,18 @@ class BeerGame:
             self.backlog_F = self.orders_incoming_F + self.backlog_F - self.inv_F
             self.delay2_F = self.inv_F
             self.inv_F = 0
-
-        #Players Choice
-        self.orders_placed_R = self.ChooseRetail()
-        self.prod_request = self.ChooseFactory()
-
+            
+        
         #Transfer orders
         self.orders_incoming_F = self.orders_placed_R
 
         #Factory Orders
         self.prod_delay2 = self.prod_request
+        
+        #Players Choice
+        self.orders_placed_R = self.ChooseRetail()
+        self.prod_request = self.ChooseFactory()
+
 
         #Record Cost
         self.cost_R.append(self.inv_R*self.cost_inv + self.backlog_R*self.cost_backlog)
