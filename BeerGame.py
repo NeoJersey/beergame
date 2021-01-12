@@ -136,8 +136,8 @@ class BeerGame:
 
     def print(self,j):
         print("Iteration: ", j)
-        print("Cost R: ", self.cost_R, sum(self.cost_R))
-        print("Cost F: ", self.cost_F, sum(self.cost_F))
+        print("Cost R: ", sum(self.cost_R),self.cost_R)
+        print("Cost F: ", sum(self.cost_F),self.cost_F)
         self.Retailer.debug()
         self.Factory.debug()
 

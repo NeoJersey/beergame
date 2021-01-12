@@ -41,4 +41,4 @@ class SarsaBeer:
         return self.choices[next_action]
 
     def debug(self):
-        print("Player: ", self.player, "state: ", self.last_state, "Q:", self.Q)
+        print("Player: ", self.player, "Q:", self.Q)
