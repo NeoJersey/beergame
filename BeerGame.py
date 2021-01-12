@@ -1,4 +1,4 @@
-import random, WoLFBeer
+import random, WoLFBeer, SarsaBeer
 
 
 class BeerGame:
@@ -30,13 +30,14 @@ class BeerGame:
 
         self.choices = [0, 4, 10, 20, 30]
 
-        self.Retailer = WoLFBeer.WoLFBeer("Retailer", 0.5, 0.9, 0.05, 0.1, self.choices)
-        self.Factory = WoLFBeer.WoLFBeer("Factory", 0.5, 0.9, 0.05, 0.1, self.choices)
-
-        for j in range(5):
+        self.Retailer = SarsaBeer.SarsaBeer("Retailer", 0.5, 0.9, 0.1, self.choices, 6, 5, 4)
+        self.Factory = SarsaBeer.SarsaBeer("Factory", 0.5, 0.9, 0.1, self.choices, 6, 5, 4)
+        weeks = 10000
+        for j in range(weeks):
             for i in range(len(self.demand_cus)):
-                self.WeekLoop(i, i+j)
-            self.print(j)
+                self.WeekLoop(i, i*j)
+            if j % (weeks/10) == 0 or j == weeks - 1:
+                self.print(j)
             self.Initial()
 
     def Initial(self):
@@ -90,12 +91,40 @@ class BeerGame:
         # Player Updates
         curr_cost_R = self.inv_R * self.cost_inv + self.backlog_R * self.cost_backlog
         curr_cost_F = self.inv_F * self.cost_inv + self.backlog_F * self.cost_backlog
-        self.Retailer.update(self.orders_placed_R, -curr_cost_R)
-        self.Factory.update(self.prod_request, -curr_cost_F)
 
-        # Players Choice
-        self.orders_placed_R = self.Retailer.getMove(tick)
-        self.prod_request = self.Factory.getMove(tick)
+
+        # Players State
+        if self.inv_R == 0:
+            r_state = 0
+        else:
+            if self.inv_R > 100:
+                r_state = 2
+            elif self.inv_R > 50:
+                r_state = 3
+            elif self.inv_R > 25:
+                r_state = 4
+            elif self.inv_R > 10:
+                r_state = 5
+            else:
+                r_state = 1
+        if self.inv_F == 0:
+            f_state = 0
+        else:
+            if self.inv_F > 100:
+                f_state = 2
+            elif self.inv_F > 50:
+                f_state = 3
+            elif self.inv_F > 25:
+                f_state = 4
+            elif self.inv_F > 10:
+                f_state = 5
+            else:
+                f_state = 1
+
+
+        # Players Choice and Update
+        self.orders_placed_R = self.Retailer.update(-curr_cost_R, r_state, tick)
+        self.prod_request = self.Factory.update(-curr_cost_F, f_state, tick)
 
         # Record Cost
         self.cost_R.append(curr_cost_R)
@@ -103,7 +132,7 @@ class BeerGame:
 
         if (False):
             print("R: ", self.orders_placed_R, self.inv_R, self.backlog_R)
-            print("F: ", self.prod_request, self.inv_F, self.backlog_F)
+            #print("F: ", self.prod_request, self.inv_F, self.backlog_F)
 
     def print(self,j):
         print("Iteration: ", j)
