@@ -30,8 +30,8 @@ class BeerGame:
 
         self.choices = [0, 4, 10, 20, 30]
 
-        self.Retailer = SarsaBeer.SarsaBeer("Retailer", 0.5, 0.9, 0.1, self.choices, 6, 5, 4)
-        self.Factory = SarsaBeer.SarsaBeer("Factory", 0.5, 0.9, 0.1, self.choices, 6, 5, 4)
+        self.Retailer = SarsaBeer.SarsaBeer("Retailer", 0.5, 0.9, 0.1, self.choices, 10, 5, 4)
+        self.Factory = SarsaBeer.SarsaBeer("Factory", 0.5, 0.9, 0.1, self.choices, 10, 5, 4)
         weeks = 10000
         for j in range(weeks):
             for i in range(len(self.demand_cus)):
@@ -95,29 +95,47 @@ class BeerGame:
 
         # Players State
         if self.inv_R == 0:
-            r_state = 0
+            if self.backlog_R > 100:
+                r_state = 9
+            elif self.backlog_R > 50:
+                r_state = 8
+            elif self.backlog_R > 25:
+                r_state = 7
+            elif self.backlog_R > 10:
+                r_state = 6
+            else:
+                r_state = 0
         else:
             if self.inv_R > 100:
-                r_state = 2
-            elif self.inv_R > 50:
-                r_state = 3
-            elif self.inv_R > 25:
-                r_state = 4
-            elif self.inv_R > 10:
                 r_state = 5
+            elif self.inv_R > 50:
+                r_state = 4
+            elif self.inv_R > 25:
+                r_state = 3
+            elif self.inv_R > 10:
+                r_state = 2
             else:
                 r_state = 1
         if self.inv_F == 0:
-            f_state = 0
+            if self.backlog_F > 100:
+                f_state = 9
+            elif self.backlog_F > 50:
+                f_state = 8
+            elif self.backlog_F > 25:
+                f_state = 7
+            elif self.backlog_F > 10:
+                f_state = 6
+            else:
+                f_state = 0
         else:
             if self.inv_F > 100:
-                f_state = 2
-            elif self.inv_F > 50:
-                f_state = 3
-            elif self.inv_F > 25:
-                f_state = 4
-            elif self.inv_F > 10:
                 f_state = 5
+            elif self.inv_F > 50:
+                f_state = 4
+            elif self.inv_F > 25:
+                f_state = 3
+            elif self.inv_F > 10:
+                f_state = 2
             else:
                 f_state = 1
 
