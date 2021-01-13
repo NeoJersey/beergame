@@ -1,4 +1,4 @@
-import random, WoLFBeer, SarsaBeer
+import random, WoLFBeer, SarsaBeer, collections
 
 
 class BeerGame:
@@ -28,6 +28,9 @@ class BeerGame:
         self.cost_R = []
         self.cost_F = []
 
+        self.picks_R = []
+        self.picks_F = []
+
         self.choices = [0, 4, 10, 20, 30]
 
         self.Retailer = SarsaBeer.SarsaBeer("Retailer", 0.5, 0.9, 0.1, self.choices, 10, 5, 4)
@@ -56,6 +59,9 @@ class BeerGame:
 
         self.cost_R = []
         self.cost_F = []
+
+        self.picks_R = []
+        self.picks_F = []
 
     def WeekLoop(self, i, tick):
         # transfer
@@ -144,6 +150,9 @@ class BeerGame:
         self.orders_placed_R = self.Retailer.update(-curr_cost_R, r_state, tick)
         self.prod_request = self.Factory.update(-curr_cost_F, f_state, tick)
 
+        self.picks_R.append(self.orders_placed_R)
+        self.picks_F.append(self.prod_request)
+
         # Record Cost
         self.cost_R.append(curr_cost_R)
         self.cost_F.append(curr_cost_F)
@@ -156,6 +165,8 @@ class BeerGame:
         print("Iteration: ", j)
         print("Cost R: ", sum(self.cost_R),self.cost_R)
         print("Cost F: ", sum(self.cost_F),self.cost_F)
+        print("Picks R: ", collections.Counter(self.picks_R), self.picks_R)
+        print("Picks F: ", collections.Counter(self.picks_F), self.picks_F)
         self.Retailer.debug()
         self.Factory.debug()
 
