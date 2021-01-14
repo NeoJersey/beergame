@@ -1,4 +1,4 @@
-import random, WoLFBeer, SarsaBeer, collections
+import random, WoLFBeer, SarsaBeer, collections, distribution
 
 
 class BeerGame:
@@ -33,9 +33,14 @@ class BeerGame:
 
         self.choices = [0, 4, 10, 20, 30]
 
+        self.forced = True
+        self.distr = distribution.distribution(2)
+        self.nextChoice = 0
+        self.updateCount = 0
+
         self.Retailer = SarsaBeer.SarsaBeer("Retailer", 0.5, 0.9, 0.1, self.choices, 10, 5, 4)
         self.Factory = SarsaBeer.SarsaBeer("Factory", 0.5, 0.9, 0.1, self.choices, 10, 5, 4)
-        weeks = 10000
+        weeks = 1000000
         for j in range(weeks):
             for i in range(len(self.demand_cus)):
                 self.WeekLoop(i, i*j)
@@ -62,6 +67,9 @@ class BeerGame:
 
         self.picks_R = []
         self.picks_F = []
+
+        self.nextChoice = 0
+        self.updateCount = 0
 
     def WeekLoop(self, i, tick):
         # transfer
@@ -94,7 +102,7 @@ class BeerGame:
         # Factory Orders
         self.prod_delay2 = self.prod_request
 
-        # Player Updates
+        # Player Costs
         curr_cost_R = self.inv_R * self.cost_inv + self.backlog_R * self.cost_backlog
         curr_cost_F = self.inv_F * self.cost_inv + self.backlog_F * self.cost_backlog
 
@@ -147,8 +155,18 @@ class BeerGame:
 
 
         # Players Choice and Update
-        self.orders_placed_R = self.Retailer.update(-curr_cost_R, r_state, tick)
-        self.prod_request = self.Factory.update(-curr_cost_F, f_state, tick)
+        if self.forced:
+            if i == self.nextChoice:
+                self.orders_placed_R = self.Retailer.update(-curr_cost_R, r_state, tick)
+                self.prod_request = self.Factory.update(-curr_cost_F, f_state, tick)
+                self.nextChoice = i + self.distr.getNext()
+                self.updateCount += 1
+            else:
+                _ = self.Retailer.update(-curr_cost_R, r_state, tick)
+                _ = self.Factory.update(-curr_cost_F, f_state, tick)
+        else:
+            self.orders_placed_R = self.Retailer.update(-curr_cost_R, r_state, tick)
+            self.prod_request = self.Factory.update(-curr_cost_F, f_state, tick)
 
         self.picks_R.append(self.orders_placed_R)
         self.picks_F.append(self.prod_request)
@@ -159,7 +177,7 @@ class BeerGame:
 
         if (False):
             print("R: ", self.orders_placed_R, self.inv_R, self.backlog_R)
-            #print("F: ", self.prod_request, self.inv_F, self.backlog_F)
+            print("F: ", self.prod_request, self.inv_F, self.backlog_F)
 
     def print(self,j):
         print("Iteration: ", j)
@@ -167,6 +185,8 @@ class BeerGame:
         print("Cost F: ", sum(self.cost_F),self.cost_F)
         print("Picks R: ", collections.Counter(self.picks_R), self.picks_R)
         print("Picks F: ", collections.Counter(self.picks_F), self.picks_F)
+        if self.forced:
+            print("Update Count: ", self.updateCount)
         self.Retailer.debug()
         self.Factory.debug()
 
