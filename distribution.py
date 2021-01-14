@@ -9,7 +9,7 @@ class distribution:
 
     def getNext(self):
         next = self.data[self.count]
-        if next < 0:
+        if next < 1:
             next = 1
         self.count +=1
         if self.count == 5000:

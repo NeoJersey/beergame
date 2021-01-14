@@ -40,7 +40,7 @@ class BeerGame:
 
         self.Retailer = SarsaBeer.SarsaBeer("Retailer", 0.5, 0.9, 0.1, self.choices, 10, 5, 4)
         self.Factory = SarsaBeer.SarsaBeer("Factory", 0.5, 0.9, 0.1, self.choices, 10, 5, 4)
-        weeks = 1000000
+        weeks = 10
         for j in range(weeks):
             for i in range(len(self.demand_cus)):
                 self.WeekLoop(i, i*j)
