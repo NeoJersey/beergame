@@ -28,7 +28,10 @@ class SarsaBeer:
             return index
 
     def update(self, reward, next_state, tick, repeated):
-        next_action = self.pickAction(tick, next_state)
+        if not repeated:
+            next_action = self.pickAction(tick, next_state)
+        else:
+            next_action = self.last_action
         #print(self.Q, next_state, next_action, self.last_state, self.last_action)
         delta = reward + self.gamma*self.Q[next_state][next_action] - self.Q[self.last_state][self.last_action]
         self.e[self.last_state][self.last_action] += 1
