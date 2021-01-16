@@ -27,7 +27,7 @@ class SarsaBeer:
             index = self.Q[next_state].index(max(self.Q[next_state]))
             return index
 
-    def update(self, reward, next_state, tick):
+    def update(self, reward, next_state, tick, repeated):
         next_action = self.pickAction(tick, next_state)
         #print(self.Q, next_state, next_action, self.last_state, self.last_action)
         delta = reward + self.gamma*self.Q[next_state][next_action] - self.Q[self.last_state][self.last_action]
@@ -37,7 +37,8 @@ class SarsaBeer:
                 self.Q[i][j] += self.alpha * delta * self.e[i][j]
                 self.e[i][j] *= self.gamma * self.my_lambda
         self.last_state = next_state
-        self.last_action = next_action
+        if not repeated:
+            self.last_action = next_action
         return self.choices[next_action]
 
     def debug(self):
