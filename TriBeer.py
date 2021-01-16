@@ -187,19 +187,19 @@ class TriBeer:
         #Players Choice and Update
         if self.forced:
             if i == self.nextChoice:
-                self.orders_placed_R = self.Retailer.update(-curr_cost_R, r_state, tick)
-                self.orders_placed_W = self.Wholesaler.update(-curr_cost_W, w_state, tick)
-                self.prod_request = self.Factory.update(-curr_cost_F, f_state, tick)
+                self.orders_placed_R = self.Retailer.update(-curr_cost_R, r_state, tick, False)
+                self.orders_placed_W = self.Wholesaler.update(-curr_cost_W, w_state, tick, False)
+                self.prod_request = self.Factory.update(-curr_cost_F, f_state, tick, False)
                 self.nextChoice = i + self.distr.getNext()
                 self.updateCount += 1
             else:
-                _ = self.Retailer.update(-curr_cost_R, r_state, tick)
-                _ = self.Wholesaler.update(-curr_cost_W, w_state, tick)
-                _ = self.Factory.update(-curr_cost_F, f_state, tick)
+                _ = self.Retailer.update(-curr_cost_R, r_state, tick, True)
+                _ = self.Wholesaler.update(-curr_cost_W, w_state, tick, True)
+                _ = self.Factory.update(-curr_cost_F, f_state, tick, True)
         else:
-            self.orders_placed_R = self.Retailer.update(-curr_cost_R, r_state, tick)
-            self.orders_placed_W = self.Wholesaler.update(-curr_cost_W, w_state, tick)
-            self.prod_request = self.Factory.update(-curr_cost_F, f_state, tick)
+            self.orders_placed_R = self.Retailer.update(-curr_cost_R, r_state, tick, False)
+            self.orders_placed_W = self.Wholesaler.update(-curr_cost_W, w_state, tick, False)
+            self.prod_request = self.Factory.update(-curr_cost_F, f_state, tick, False)
 
         self.picks_R.append(self.orders_placed_R)
         self.picks_W.append(self.orders_placed_W)
