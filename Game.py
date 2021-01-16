@@ -2,9 +2,14 @@ import Human, TestPlayer, WoLF, distribution
 from NashQ import NashQ
 import numpy as np
 import nashpy as nash
-METHOD = "WoLF"
-# METHOD = "NashQ"
-REPEATED_ACTION = False
+# METHOD = "WoLF"
+METHOD = "NashQ"
+REPEATED_ACTION = True
+
+def updateNash(player, actions, nash_actions, rewards, tick):
+    player.update(actions[player.player], actions[1 - player.player], nash_actions, 0, rewards)
+    player.epsilon = 1 / tick
+    return player
 
 class Game:
 
@@ -28,6 +33,9 @@ class Game:
     def getMoveReward(self, onePick, twoPick, player):
         return self.game[onePick][twoPick][player]
 
+    def getMovesReward(self, onePick, twoPick):
+        return self.game[onePick][twoPick]
+
     def getMoveValues(self, onePick, twoPick):
         return self.game[onePick][twoPick]
 
@@ -35,63 +43,75 @@ class Game:
         onePick = self.playerOne.getMove(0, [0,0], 0)
         twoPick = self.playerTwo.getMove(0, [0,0], 0)
         self.tick += 1
-        self.playerOne.printpi()
+        # self.playerOne.printpi()
         self.nextMove = self.tick + self.distr.getNext()
         self.loop(onePick, twoPick)
 
     def loop(self, onePick, twoPick):
         updateCount = 0
+        players = [self.playerOne, self.playerTwo]
+        actions = []
+        nash_actions = []
+        rewards = self.getMovesReward(onePick, twoPick)
         while(self.tick < 10000):
 
             if not REPEATED_ACTION:  # activate or deactivate repeated action pairs
                 self.nextMove = self.tick
-                print("repeated")
 
-            if self.tick == self.nextMove:
-                updateCount +=1
-                onePick = self.playerOne.getMove(self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()), [onePick, twoPick], self.tick)
-                twoPick = self.playerTwo.getMove(self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()), [onePick, twoPick], self.tick)
-                self.nextMove = self.tick + self.distr.getNext()
-                print("Player 0: ", "Pick: ", onePick, "Reward:",self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()), "Tick: ", self.tick)
-                print("Player 1: ", "Pick: ", twoPick, "Reward:",self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()))
-            self.playerOne.update(onePick, 0, self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()))
-            self.playerTwo.update(twoPick, 0, self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()))
+            if METHOD == 'WoLF':
+                if self.tick == self.nextMove:
+                    updateCount += 1
+                    onePick = self.playerOne.getMove(self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()), [onePick, twoPick], self.tick)
+                    twoPick = self.playerTwo.getMove(self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()), [onePick, twoPick], self.tick)
+                    self.nextMove = self.tick + self.distr.getNext()
+                    print("Player 0: ", "Pick: ", onePick, "Reward:", self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()), "Tick: ", self.tick)
+                    print("Player 1: ", "Pick: ", twoPick, "Reward:", self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()))
+                self.playerOne.update(onePick, 0, self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()))
+                self.playerTwo.update(twoPick, 0, self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()))
 
-            # else:
-            # self.playerOne.updateQ(onePick, 0, self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()))
-            # self.playerTwo.updateQ(twoPick, 0, self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()))
+            elif METHOD == 'NashQ':
+                # calculate new action
+                if self.tick == self.nextMove or self.tick == 1:
+                    updateCount += 1
+                    actions = []
+                    #choose action
+                    for player in players:
+                        actions.append(player.select_action(self.tick))
+                    self.nextMove = self.tick + self.distr.getNext()
+                    onePick, twoPick = actions
+                    print("Player 0: ", "Pick: ", onePick, "Reward:", self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()), "Tick: ", self.tick)
+                    print("Player 1: ", "Pick: ", twoPick, "Reward:", self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()))
+                    rewards = self.getMovesReward(onePick,twoPick)
+                    nash_actions = []
+                    # search nash strategy
+                    for i, player in enumerate(players):
+                        nash_actions.append(player.nash_action(0))
+                players_update = []
+                #observe and update
+                for player in players:
+                    players_update.append(updateNash(player, actions, nash_actions, rewards, self.tick))
+                players = players_update
+
             self.countMoves[0, onePick] += 1
             self.countMoves[1, twoPick] += 1
             self.tick += 1
         print("Player 0: ","Pick: ", onePick, "Reward:", self.getMoveReward(onePick, twoPick, self.playerOne.getPlayer()), "Tick: " ,self.tick)
         print("Player 1: ","Pick: ", twoPick, "Reward:", self.getMoveReward(onePick, twoPick, self.playerTwo.getPlayer()))
         print(f"Number of Selections: {updateCount}")
-        print("player 1 played:", self.countMoves[0])
-        print("player 2 played:", self.countMoves[1])
+        print("player 1 played:", int(self.countMoves[0][0]), int(self.countMoves[0][1]))
+        print("player 2 played:", int(self.countMoves[1][0]), int(self.countMoves[1][1]))
         # self.playerOne.printpi()
         # self.playerTwo.printpi()
-#onePick*2+twoPick
+        #onePick*2+twoPick
 
 def main():
     # newGame = Game([2,2], [5,0], [0,5], [4,4]) #prisoner dilemma
     newGame = Game([1,-1], [-1,1], [-1,1], [1,-1]) #matching pennies
 
-    A = np.array([[2, 5], [0, 4]])
-    B = np.array([[2,0] , [5,4]])
-    game = nash.Game(A, B)
-    print("nashhhh \n", game)
-    x = game.support_enumeration()
-    for eq in x:
-        print("equi", eq)
-
-    # newGame = Game([3, 2], [0, 0], [1, 1], [2, 3])
-    print(newGame)
-    print(newGame.getMoveValues(0, 1))
-    print("reward",newGame.getMoveReward(0, 1, 1))
+    # print(newGame)
+    # print(newGame.getMoveValues(0, 1))
+    # print("reward",newGame.getMoveReward(0, 1, 1))
     newGame.startLoop()
-
-# [-3,-3] [0,-5]
-# [-5,0] [-1,-1]
 
 if __name__ == "__main__":
     main()

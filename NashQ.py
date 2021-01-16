@@ -13,7 +13,6 @@ class NashQ:
         self.num_actions = num_actions
         self.base_alpha = alpha
         self.Q = np.zeros((2, num_states, self.num_actions, self.num_actions))
-        # self.pi = defaultdict(partial(np.random.dirichlet, [1.0] * self.action_num))
         self.last_state = -1
         self.history_alpha = np.zeros((num_states, self.num_actions, self.num_actions))
         self.history_act = np.zeros((num_states, 1))
@@ -23,7 +22,7 @@ class NashQ:
         value = self.select_action(tick)
         return value
 
-
+    """calculate actions a^i_t"""
     def select_action(self,tick):
         state = self.last_state
         if random.random() < self.epsilon:
@@ -67,19 +66,18 @@ class NashQ:
 
     def update(self, own, other,nash_actions, state, rewards):
         self.history_alpha[state, own, other] += 1
-        print("previous actions", nash_actions)
         nash_actions_local = nash_actions[self.player]
         V = np.zeros(2)
         if None not in nash_actions_local:
-            # V[0] = self.Q[0, state, nash_actions_local[0], nash_actions_local[1]]
-            # V[1] = self.Q[1, state, nash_actions_local[1], nash_actions_local[0]]
+            V[0] = self.Q[0, state, nash_actions_local[0], nash_actions_local[1]]
+            V[1] = self.Q[1, state, nash_actions_local[1], nash_actions_local[0]]
             # print("V",V)
-            for i in range(len(nash_actions_local)):
-                for j in range(len(nash_actions_local)):# it's probabilities now
-                    V[0] += self.Q[0, state, i, j]*nash_actions[0][i]*nash_actions[1][j]
-            for i in range(len(nash_actions_local)):
-                for j in range(len(nash_actions_local)):# it's probabilities now
-                    V[1] += self.Q[1, state, j, i]*nash_actions[0][i]*nash_actions[1][j]
+            # for i in range(len(nash_actions_local)):
+            #     for j in range(len(nash_actions_local)):# it's probabilities now
+            #         V[0] += self.Q[0, state, i, j]*nash_actions[0][i]*nash_actions[1][j]
+            # for i in range(len(nash_actions_local)):
+            #     for j in range(len(nash_actions_local)):# it's probabilities now
+            #         V[1] += self.Q[1, state, j, i]*nash_actions[0][i]*nash_actions[1][j]
         else:
             V[0] = self.val(state, 0)
             V[1] = self.val(state, 1)
@@ -101,8 +99,8 @@ class NashQ:
     def getPlayer(self):
         return self.player
 
-    def val(self, state, agent_num):
-        return np.max(self.Q[agent_num, state])
+    def val(self, state, player_num):
+        return np.max(self.Q[player_num, state])
 
 
 
