@@ -1,5 +1,6 @@
 import random, WoLFBeer, SarsaBeer, collections, distribution
-
+import numpy as np 
+import pandas as pd
 
 class BeerGame:
 
@@ -34,19 +35,48 @@ class BeerGame:
         self.choices = [0, 4, 10, 20, 30]
 
         self.forced = True
-        self.distr = distribution.distribution(2)
+        self.distr = distribution.distribution(4)
         self.nextChoice = 0
         self.updateCount = 0
 
         self.Retailer = SarsaBeer.SarsaBeer("Retailer", 0.5, 0.9, 0.1, self.choices, 10, 5, 4)
         self.Factory = SarsaBeer.SarsaBeer("Factory", 0.5, 0.9, 0.1, self.choices, 10, 5, 4)
-        weeks = 10000
+        weeks = 500000
+        
+        # making records for dataframe
+        total_cost_R = []
+        total_cost_F = []
+        ratio_cost = []
+        var_R = []
+        var_F = []
+        ratio_var = []
+        
         for j in range(weeks):
             for i in range(len(self.demand_cus)):
                 self.WeekLoop(i, i*j)
             if j % (weeks/10) == 0 or j == weeks - 1:
                 self.print(j)
+            total_cost_R.append(sum(self.cost_R))
+            total_cost_F.append(sum(self.cost_F))
+            #ratio_cost.append(sum(self.cost_R)/sum(self.cost_F))
+            var_R.append(np.var(self.picks_R))
+            var_F.append(np.var(self.picks_F))
+            #ratio_var.append(np.var(self.picks_R)/np.var(self.picks_F))
             self.Initial()
+            self.Initial()
+
+        # output a csv to make analysis easier
+        df = {
+          'total_cost_R':total_cost_R,
+          'total_cost_F':total_cost_F,
+          # 'ratio_cost':ratio_cost,
+          'var_R':var_R,
+          'var_F':var_F
+          #'ratio_var':ratio_var
+        }
+        
+        df = pd.DataFrame(df)
+        df.to_csv('FRAP44.csv')
 
     def Initial(self):
         self.inv_R = 12
