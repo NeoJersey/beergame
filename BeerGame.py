@@ -35,7 +35,7 @@ class BeerGame:
         self.choices = [0, 4, 10, 20, 30]
 
         self.forced = True
-        self.distr = distribution.distribution(4)
+        self.distr = distribution.distribution(2)
         self.nextChoice = 0
         self.updateCount = 0
 
@@ -76,7 +76,7 @@ class BeerGame:
         }
         
         df = pd.DataFrame(df)
-        df.to_csv('FRAP44.csv')
+        df.to_csv('FRAP2.csv')
 
     def Initial(self):
         self.inv_R = 12
